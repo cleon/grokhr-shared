@@ -13,7 +13,8 @@
     "department",
     "title",
     "hireDate",
-    "status"
+    "status",
+    "employmentType"
   ],
   "properties": {
     "id": {
@@ -51,6 +52,11 @@
     "status": {
       "type": "string",
       "enum": ["active", "inactive"]
+    },
+    "employmentType": {
+      "type": "string",
+      "enum": ["full_time", "part_time", "contractor"],
+      "description": "Employment classification used for headcount reporting."
     }
   },
   "examples": [
@@ -62,7 +68,8 @@
       "department": "People Operations",
       "title": "HR Generalist",
       "hireDate": "2022-03-14",
-      "status": "active"
+      "status": "active",
+      "employmentType": "full_time"
     }
   ],
   "$defs": {
@@ -78,7 +85,8 @@
         "department",
         "title",
         "hireDate",
-        "status"
+        "status",
+        "employmentType"
       ],
       "properties": {
         "firstName": { "$ref": "#/properties/firstName" },
@@ -87,7 +95,8 @@
         "department": { "$ref": "#/properties/department" },
         "title": { "$ref": "#/properties/title" },
         "hireDate": { "$ref": "#/properties/hireDate" },
-        "status": { "$ref": "#/properties/status" }
+        "status": { "$ref": "#/properties/status" },
+        "employmentType": { "$ref": "#/properties/employmentType" }
       }
     },
     "EmployeeUpdate": {
@@ -102,7 +111,8 @@
         "department": { "$ref": "#/properties/department" },
         "title": { "$ref": "#/properties/title" },
         "hireDate": { "$ref": "#/properties/hireDate" },
-        "status": { "$ref": "#/properties/status" }
+        "status": { "$ref": "#/properties/status" },
+        "employmentType": { "$ref": "#/properties/employmentType" }
       }
     }
   }

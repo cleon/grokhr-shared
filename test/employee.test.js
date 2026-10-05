@@ -5,6 +5,7 @@ import { ZodError } from "zod";
 
 import {
   EMPLOYEE_STATUSES,
+  EMPLOYMENT_TYPES,
   displayName,
   employeeCreateSchema,
   employeeSchema,
@@ -22,6 +23,12 @@ const schema = JSON.parse(
 function withoutId(employee) {
   const { id: _id, ...create } = employee;
   return create;
+}
+
+function without(employee, field) {
+  const copy = { ...employee };
+  delete copy[field];
+  return copy;
 }
 
 test("parses the shared example and helpers", () => {
@@ -43,24 +50,33 @@ test("rejects invalid employee documents", () => {
   assert.throws(() => employeeSchema.parse({ ...example, email: "not-an-email" }), ZodError);
   assert.throws(() => employeeSchema.parse({ ...example, firstName: "" }), ZodError);
   assert.throws(() => employeeSchema.parse({ ...example, nickname: "Ace" }), ZodError);
+  assert.throws(() => employeeSchema.parse({ ...example, employmentType: "intern" }), ZodError);
+  assert.throws(() => employeeSchema.parse(without(example, "employmentType")), ZodError);
 });
 
 test("create omits id and update is a partial", () => {
   const create = withoutId(example);
   assert.deepEqual(employeeCreateSchema.parse(create), create);
   assert.throws(() => employeeCreateSchema.parse(example), ZodError);
+  assert.throws(() => employeeCreateSchema.parse(without(create, "employmentType")), ZodError);
 
   assert.deepEqual(employeeUpdateSchema.parse({ title: "HR Manager" }), {
     title: "HR Manager",
   });
+  assert.deepEqual(employeeUpdateSchema.parse({ employmentType: "contractor" }), {
+    employmentType: "contractor",
+  });
   assert.deepEqual(employeeUpdateSchema.parse({}), {});
   assert.throws(() => employeeUpdateSchema.parse({ title: null }), ZodError);
+  assert.throws(() => employeeUpdateSchema.parse({ employmentType: null }), ZodError);
+  assert.throws(() => employeeUpdateSchema.parse({ employmentType: "intern" }), ZodError);
   assert.throws(() => employeeUpdateSchema.parse({ id: example.id }), ZodError);
 });
 
 test("zod object matches the canonical schema", () => {
   assert.deepEqual(Object.keys(employeeSchema.shape).sort(), [...schema.required].sort());
   assert.deepEqual([...EMPLOYEE_STATUSES], schema.properties.status.enum);
+  assert.deepEqual([...EMPLOYMENT_TYPES], schema.properties.employmentType.enum);
   assert.deepEqual(schema.examples[0], example);
   assert.deepEqual(
     schema.$defs.EmployeeCreate.required.sort(),

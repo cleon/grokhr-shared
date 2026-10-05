@@ -8,10 +8,12 @@ from pydantic import ValidationError
 
 from grokhr_shared import (
     EMPLOYEE_STATUSES,
+    EMPLOYMENT_TYPES,
     Employee,
     EmployeeCreate,
     EmployeeUpdate,
     EmployeeStatus,
+    EmploymentType,
     display_name,
     is_active,
     load_employee_schema,
@@ -23,6 +25,10 @@ EXAMPLE = json.loads((ROOT / "fixtures" / "employee.example.json").read_text(enc
 
 def _without_id(employee: dict) -> dict:
     return {key: value for key, value in employee.items() if key != "id"}
+
+
+def _without(employee: dict, field: str) -> dict:
+    return {key: value for key, value in employee.items() if key != field}
 
 
 def _subschema(schema: dict, name: str) -> dict:
@@ -62,6 +68,10 @@ def test_rejects_invalid_employee_documents():
         Employee.model_validate({**EXAMPLE, "firstName": ""})
     with pytest.raises(ValidationError):
         Employee.model_validate({**EXAMPLE, "nickname": "Ace"})
+    with pytest.raises(ValidationError):
+        Employee.model_validate({**EXAMPLE, "employmentType": "intern"})
+    with pytest.raises(ValidationError):
+        Employee.model_validate(_without(EXAMPLE, "employmentType"))
 
 
 def test_create_omits_id_and_update_is_partial():
@@ -71,11 +81,21 @@ def test_create_omits_id_and_update_is_partial():
     with pytest.raises(ValidationError):
         EmployeeCreate.model_validate(EXAMPLE)
 
+    with pytest.raises(ValidationError):
+        EmployeeCreate.model_validate(_without(create_body, "employmentType"))
+
     patch = EmployeeUpdate.model_validate({"title": "HR Manager"})
     assert patch.model_dump(exclude_unset=True) == {"title": "HR Manager"}
+    classification = EmployeeUpdate.model_validate({"employmentType": "contractor"})
+    assert classification.employmentType is EmploymentType.contractor
+    assert classification.model_dump(exclude_unset=True) == {"employmentType": "contractor"}
     assert EmployeeUpdate.model_validate({}).model_dump(exclude_unset=True) == {}
     with pytest.raises(ValidationError):
         EmployeeUpdate.model_validate({"title": None})
+    with pytest.raises(ValidationError):
+        EmployeeUpdate.model_validate({"employmentType": None})
+    with pytest.raises(ValidationError):
+        EmployeeUpdate.model_validate({"employmentType": "intern"})
     with pytest.raises(ValidationError):
         EmployeeUpdate.model_validate({"id": EXAMPLE["id"]})
 
@@ -87,6 +107,7 @@ def test_model_matches_canonical_schema():
     assert set(Employee.model_fields) == set(schema["required"])
     assert set(EmployeeCreate.model_fields) == set(schema["required"]) - {"id"}
     assert list(EMPLOYEE_STATUSES) == schema["properties"]["status"]["enum"]
+    assert list(EMPLOYMENT_TYPES) == schema["properties"]["employmentType"]["enum"]
     assert schema["examples"][0] == EXAMPLE
 
     validator = Draft202012Validator(schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
@@ -95,6 +116,10 @@ def test_model_matches_canonical_schema():
         validator.validate({**EXAMPLE, "status": "terminated"})
     with pytest.raises(SchemaValidationError):
         validator.validate({**EXAMPLE, "hireDate": "2022-02-31"})
+    with pytest.raises(SchemaValidationError):
+        validator.validate({**EXAMPLE, "employmentType": "intern"})
+    with pytest.raises(SchemaValidationError):
+        validator.validate(_without(EXAMPLE, "employmentType"))
 
     create_schema = _subschema(schema, "EmployeeCreate")
     assert set(create_schema["required"]) == set(schema["required"]) - {"id"}
@@ -104,13 +129,20 @@ def test_model_matches_canonical_schema():
     create_validator.validate(_without_id(EXAMPLE))
     with pytest.raises(SchemaValidationError):
         create_validator.validate(EXAMPLE)
+    with pytest.raises(SchemaValidationError):
+        create_validator.validate(_without(_without_id(EXAMPLE), "employmentType"))
 
     update_schema = _subschema(schema, "EmployeeUpdate")
     assert "required" not in update_schema
     update_validator = Draft202012Validator(update_schema)
     update_validator.validate({})
     update_validator.validate({"title": "HR Manager"})
+    update_validator.validate({"employmentType": "part_time"})
     with pytest.raises(SchemaValidationError):
         update_validator.validate({"title": None})
+    with pytest.raises(SchemaValidationError):
+        update_validator.validate({"employmentType": None})
+    with pytest.raises(SchemaValidationError):
+        update_validator.validate({"employmentType": "intern"})
     with pytest.raises(SchemaValidationError):
         update_validator.validate({"id": EXAMPLE["id"]})

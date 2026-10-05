@@ -20,7 +20,14 @@ class EmployeeStatus(str, Enum):
     inactive = "inactive"
 
 
+class EmploymentType(str, Enum):
+    full_time = "full_time"
+    part_time = "part_time"
+    contractor = "contractor"
+
+
 EMPLOYEE_STATUSES = tuple(status.value for status in EmployeeStatus)
+EMPLOYMENT_TYPES = tuple(employment_type.value for employment_type in EmploymentType)
 
 
 class EmployeeBase(BaseModel):
@@ -33,6 +40,7 @@ class EmployeeBase(BaseModel):
     title: str = Field(min_length=1)
     hireDate: date
     status: EmployeeStatus
+    employmentType: EmploymentType
 
 
 class EmployeeCreate(EmployeeBase):
@@ -55,6 +63,7 @@ class EmployeeUpdate(BaseModel):
     title: str | None = Field(default=None, min_length=1)
     hireDate: date | None = None
     status: EmployeeStatus | None = None
+    employmentType: EmploymentType | None = None
 
     @field_validator(
         "firstName",
@@ -64,6 +73,7 @@ class EmployeeUpdate(BaseModel):
         "title",
         "hireDate",
         "status",
+        "employmentType",
         mode="before",
     )
     @classmethod

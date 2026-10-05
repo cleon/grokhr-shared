@@ -2,10 +2,12 @@
 
 from grokhr_shared.employee import (
     EMPLOYEE_STATUSES,
+    EMPLOYMENT_TYPES,
     Employee,
     EmployeeCreate,
     EmployeeStatus,
     EmployeeUpdate,
+    EmploymentType,
     display_name,
     employee_schema_path,
     is_active,
@@ -14,14 +16,16 @@ from grokhr_shared.employee import (
 
 __all__ = [
     "EMPLOYEE_STATUSES",
+    "EMPLOYMENT_TYPES",
     "Employee",
     "EmployeeCreate",
     "EmployeeStatus",
     "EmployeeUpdate",
+    "EmploymentType",
     "display_name",
     "employee_schema_path",
     "is_active",
     "load_employee_schema",
 ]
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"

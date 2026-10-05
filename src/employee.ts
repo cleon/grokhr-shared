@@ -7,6 +7,13 @@ export const employeeStatusSchema = z.enum(EMPLOYEE_STATUSES);
 
 export type EmployeeStatus = z.infer<typeof employeeStatusSchema>;
 
+/** Wire values for Employee.employmentType. Matches the JSON Schema enum. */
+export const EMPLOYMENT_TYPES = ["full_time", "part_time", "contractor"] as const;
+
+export const employmentTypeSchema = z.enum(EMPLOYMENT_TYPES);
+
+export type EmploymentType = z.infer<typeof employmentTypeSchema>;
+
 export const employeeSchema = z
   .object({
     id: z.string().min(1),
@@ -17,6 +24,7 @@ export const employeeSchema = z
     title: z.string().min(1),
     hireDate: z.string().date(),
     status: employeeStatusSchema,
+    employmentType: employmentTypeSchema,
   })
   .strict();
 

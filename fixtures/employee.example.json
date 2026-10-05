@@ -1,0 +1,10 @@
+{
+  "id": "emp_example_001",
+  "firstName": "Avery",
+  "lastName": "Example",
+  "email": "avery.example@example.com",
+  "department": "People Operations",
+  "title": "HR Generalist",
+  "hireDate": "2022-03-14",
+  "status": "active"
+}

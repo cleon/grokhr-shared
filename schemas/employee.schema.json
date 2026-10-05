@@ -10,7 +10,7 @@
     "firstName",
     "lastName",
     "email",
-    "department",
+    "orgUnit",
     "title",
     "hireDate",
     "status"
@@ -34,9 +34,10 @@
       "format": "email",
       "description": "Use an @example.com address. This demo stores no real PII."
     },
-    "department": {
+    "orgUnit": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "description": "Organizational unit from the People Ops taxonomy."
     },
     "title": {
       "type": "string",
@@ -59,7 +60,7 @@
       "firstName": "Avery",
       "lastName": "Example",
       "email": "avery.example@example.com",
-      "department": "People Operations",
+      "orgUnit": "People Operations",
       "title": "HR Generalist",
       "hireDate": "2022-03-14",
       "status": "active"
@@ -75,7 +76,7 @@
         "firstName",
         "lastName",
         "email",
-        "department",
+        "orgUnit",
         "title",
         "hireDate",
         "status"
@@ -84,7 +85,7 @@
         "firstName": { "$ref": "#/properties/firstName" },
         "lastName": { "$ref": "#/properties/lastName" },
         "email": { "$ref": "#/properties/email" },
-        "department": { "$ref": "#/properties/department" },
+        "orgUnit": { "$ref": "#/properties/orgUnit" },
         "title": { "$ref": "#/properties/title" },
         "hireDate": { "$ref": "#/properties/hireDate" },
         "status": { "$ref": "#/properties/status" }
@@ -99,7 +100,7 @@
         "firstName": { "$ref": "#/properties/firstName" },
         "lastName": { "$ref": "#/properties/lastName" },
         "email": { "$ref": "#/properties/email" },
-        "department": { "$ref": "#/properties/department" },
+        "orgUnit": { "$ref": "#/properties/orgUnit" },
         "title": { "$ref": "#/properties/title" },
         "hireDate": { "$ref": "#/properties/hireDate" },
         "status": { "$ref": "#/properties/status" }

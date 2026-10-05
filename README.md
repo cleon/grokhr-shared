@@ -17,7 +17,7 @@ The canonical document is [`schemas/employee.schema.json`](schemas/employee.sche
 | `firstName` | string | Non-empty |
 | `lastName` | string | Non-empty |
 | `email` | string (email) | Use an `@example.com` address |
-| `department` | string | Non-empty |
+| `orgUnit` | string | Non-empty. Organizational unit from the People Ops taxonomy. |
 | `title` | string | Non-empty |
 | `hireDate` | string (date) | ISO calendar date `YYYY-MM-DD` |
 | `status` | string | `active` or `inactive` |
@@ -30,7 +30,7 @@ Unknown fields are rejected. `POST` body is `EmployeeCreate` (Employee without `
   "firstName": "Avery",
   "lastName": "Example",
   "email": "avery.example@example.com",
-  "department": "People Operations",
+  "orgUnit": "People Operations",
   "title": "HR Generalist",
   "hireDate": "2022-03-14",
   "status": "active"

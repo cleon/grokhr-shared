@@ -13,7 +13,7 @@ export const employeeSchema = z
     firstName: z.string().min(1),
     lastName: z.string().min(1),
     email: z.string().email(),
-    department: z.string().min(1),
+    orgUnit: z.string().min(1),
     title: z.string().min(1),
     hireDate: z.string().date(),
     status: employeeStatusSchema,

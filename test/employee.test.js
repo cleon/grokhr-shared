@@ -24,6 +24,11 @@ function withoutId(employee) {
   return create;
 }
 
+function withoutPreferredName(employee) {
+  const { preferredName: _preferredName, ...rest } = employee;
+  return rest;
+}
+
 test("parses the shared example and helpers", () => {
   const employee = employeeSchema.parse(example);
   assert.equal(displayName(employee), "Avery Example");
@@ -58,8 +63,57 @@ test("create omits id and update is a partial", () => {
   assert.throws(() => employeeUpdateSchema.parse({ id: example.id }), ZodError);
 });
 
+test("preferredName is optional, trimmed, and non-blank", () => {
+  const omitted = withoutPreferredName(example);
+  const employee = employeeSchema.parse(omitted);
+  assert.equal(employee.preferredName, undefined);
+  assert.deepEqual(employee, omitted);
+
+  assert.deepEqual(employeeSchema.parse({ ...example, preferredName: "  Ave  " }), {
+    ...example,
+    preferredName: "Ave",
+  });
+  assert.equal(
+    employeeCreateSchema.parse({ ...withoutId(omitted), preferredName: " Ave " }).preferredName,
+    "Ave",
+  );
+  assert.equal(employeeCreateSchema.parse(withoutId(omitted)).preferredName, undefined);
+  assert.deepEqual(employeeUpdateSchema.parse({ preferredName: "  Ave  " }), {
+    preferredName: "Ave",
+  });
+
+  for (const blank of ["", "   "]) {
+    assert.throws(() => employeeSchema.parse({ ...example, preferredName: blank }), ZodError);
+    assert.throws(
+      () => employeeCreateSchema.parse({ ...withoutId(example), preferredName: blank }),
+      ZodError,
+    );
+    assert.throws(() => employeeUpdateSchema.parse({ preferredName: blank }), ZodError);
+  }
+
+  assert.throws(() => employeeSchema.parse({ ...example, preferredName: null }), ZodError);
+  assert.throws(
+    () => employeeCreateSchema.parse({ ...withoutId(example), preferredName: null }),
+    ZodError,
+  );
+  assert.throws(() => employeeUpdateSchema.parse({ preferredName: null }), ZodError);
+
+  assert.equal(schema.properties.preferredName.minLength, 1);
+  assert.equal(schema.required.includes("preferredName"), false);
+  assert.equal(schema.$defs.EmployeeCreate.required.includes("preferredName"), false);
+  assert.ok(schema.$defs.EmployeeCreate.properties.preferredName);
+  assert.ok(schema.$defs.EmployeeUpdate.properties.preferredName);
+  assert.equal(schema.$defs.EmployeeUpdate.required, undefined);
+});
+
 test("zod object matches the canonical schema", () => {
-  assert.deepEqual(Object.keys(employeeSchema.shape).sort(), [...schema.required].sort());
+  assert.deepEqual(Object.keys(employeeSchema.shape).sort(), Object.keys(schema.properties).sort());
+  assert.deepEqual(
+    [...schema.required].sort(),
+    Object.keys(schema.properties)
+      .filter((field) => field !== "preferredName")
+      .sort(),
+  );
   assert.deepEqual([...EMPLOYEE_STATUSES], schema.properties.status.enum);
   assert.deepEqual(schema.examples[0], example);
   assert.deepEqual(

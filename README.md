@@ -14,7 +14,8 @@ The canonical document is [`schemas/employee.schema.json`](schemas/employee.sche
 | Field | JSON type | Rules |
 | --- | --- | --- |
 | `id` | string | Server-assigned, non-empty. Not accepted on create or patch. |
-| `firstName` | string | Non-empty |
+| `firstName` | string | Non-empty. Legal first name. |
+| `preferredName` | string | Optional on read, create, and update. Non-empty after trimming; a blank string is rejected. |
 | `lastName` | string | Non-empty |
 | `email` | string (email) | Use an `@example.com` address |
 | `department` | string | Non-empty |
@@ -28,6 +29,7 @@ Unknown fields are rejected. `POST` body is `EmployeeCreate` (Employee without `
 {
   "id": "emp_example_001",
   "firstName": "Avery",
+  "preferredName": "Ave",
   "lastName": "Example",
   "email": "avery.example@example.com",
   "department": "People Operations",
@@ -59,13 +61,13 @@ Point the web app at a packed tarball or at this checkout.
 
 ```bash
 npm pack
-# writes grokhr-shared-0.1.0.tgz
+# writes grokhr-shared-0.1.1.tgz
 ```
 
 ```json
 {
   "dependencies": {
-    "@grokhr/shared": "file:../grokhr-shared/grokhr-shared-0.1.0.tgz"
+    "@grokhr/shared": "file:../grokhr-shared/grokhr-shared-0.1.1.tgz"
   }
 }
 ```

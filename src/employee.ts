@@ -11,6 +11,7 @@ export const employeeSchema = z
   .object({
     id: z.string().min(1),
     firstName: z.string().min(1),
+    preferredName: z.string().trim().min(1).optional(),
     lastName: z.string().min(1),
     email: z.string().email(),
     department: z.string().min(1),

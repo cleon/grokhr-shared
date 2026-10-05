@@ -1,6 +1,7 @@
 {
   "id": "emp_example_001",
   "firstName": "Avery",
+  "preferredName": "Ave",
   "lastName": "Example",
   "email": "avery.example@example.com",
   "department": "People Operations",

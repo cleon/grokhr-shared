@@ -25,6 +25,12 @@
       "type": "string",
       "minLength": 1
     },
+    "preferredName": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S",
+      "description": "Optional preferred first name. Non-empty after trimming; a blank string is rejected."
+    },
     "lastName": {
       "type": "string",
       "minLength": 1
@@ -57,6 +63,7 @@
     {
       "id": "emp_example_001",
       "firstName": "Avery",
+      "preferredName": "Ave",
       "lastName": "Example",
       "email": "avery.example@example.com",
       "department": "People Operations",
@@ -82,6 +89,7 @@
       ],
       "properties": {
         "firstName": { "$ref": "#/properties/firstName" },
+        "preferredName": { "$ref": "#/properties/preferredName" },
         "lastName": { "$ref": "#/properties/lastName" },
         "email": { "$ref": "#/properties/email" },
         "department": { "$ref": "#/properties/department" },
@@ -97,6 +105,7 @@
       "additionalProperties": false,
       "properties": {
         "firstName": { "$ref": "#/properties/firstName" },
+        "preferredName": { "$ref": "#/properties/preferredName" },
         "lastName": { "$ref": "#/properties/lastName" },
         "email": { "$ref": "#/properties/email" },
         "department": { "$ref": "#/properties/department" },

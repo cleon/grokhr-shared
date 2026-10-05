@@ -23,16 +23,31 @@ class EmployeeStatus(str, Enum):
 EMPLOYEE_STATUSES = tuple(status.value for status in EmployeeStatus)
 
 
+def _prepare_preferred_name(value: object) -> object:
+    # Omitted fields never reach here. Explicit null is not a stored value.
+    if value is None:
+        raise ValueError("cannot be null")
+    if isinstance(value, str):
+        return value.strip()
+    return value
+
+
 class EmployeeBase(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     firstName: str = Field(min_length=1)
+    preferredName: str | None = Field(default=None, min_length=1)
     lastName: str = Field(min_length=1)
     email: EmailStr
     department: str = Field(min_length=1)
     title: str = Field(min_length=1)
     hireDate: date
     status: EmployeeStatus
+
+    @field_validator("preferredName", mode="before")
+    @classmethod
+    def normalize_preferred_name(cls, value: object) -> object:
+        return _prepare_preferred_name(value)
 
 
 class EmployeeCreate(EmployeeBase):
@@ -49,6 +64,7 @@ class EmployeeUpdate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     firstName: str | None = Field(default=None, min_length=1)
+    preferredName: str | None = Field(default=None, min_length=1)
     lastName: str | None = Field(default=None, min_length=1)
     email: EmailStr | None = None
     department: str | None = Field(default=None, min_length=1)
@@ -58,6 +74,7 @@ class EmployeeUpdate(BaseModel):
 
     @field_validator(
         "firstName",
+        "preferredName",
         "lastName",
         "email",
         "department",
@@ -72,6 +89,11 @@ class EmployeeUpdate(BaseModel):
         if value is None:
             raise ValueError("cannot be null")
         return value
+
+    @field_validator("preferredName", mode="before")
+    @classmethod
+    def normalize_preferred_name(cls, value: object) -> object:
+        return _prepare_preferred_name(value)
 
 
 def display_name(employee: EmployeeBase) -> str:

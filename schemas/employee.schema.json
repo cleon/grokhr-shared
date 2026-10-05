@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/grokhr/schemas/employee.schema.json",
+  "title": "Employee",
+  "description": "Employee record for the GrokHR demo. Fictional data only — no real PII.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "firstName",
+    "lastName",
+    "email",
+    "department",
+    "title",
+    "hireDate",
+    "status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Server-assigned identifier."
+    },
+    "firstName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lastName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "Use an @example.com address. This demo stores no real PII."
+    },
+    "department": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "hireDate": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "ISO 8601 calendar date (YYYY-MM-DD)."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive"]
+    }
+  },
+  "examples": [
+    {
+      "id": "emp_example_001",
+      "firstName": "Avery",
+      "lastName": "Example",
+      "email": "avery.example@example.com",
+      "department": "People Operations",
+      "title": "HR Generalist",
+      "hireDate": "2022-03-14",
+      "status": "active"
+    }
+  ],
+  "$defs": {
+    "EmployeeCreate": {
+      "title": "EmployeeCreate",
+      "description": "POST /employees body. The server assigns id.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "firstName",
+        "lastName",
+        "email",
+        "department",
+        "title",
+        "hireDate",
+        "status"
+      ],
+      "properties": {
+        "firstName": { "$ref": "#/properties/firstName" },
+        "lastName": { "$ref": "#/properties/lastName" },
+        "email": { "$ref": "#/properties/email" },
+        "department": { "$ref": "#/properties/department" },
+        "title": { "$ref": "#/properties/title" },
+        "hireDate": { "$ref": "#/properties/hireDate" },
+        "status": { "$ref": "#/properties/status" }
+      }
+    },
+    "EmployeeUpdate": {
+      "title": "EmployeeUpdate",
+      "description": "PATCH /employees/{id} body. Omit a field to leave it unchanged. Null is invalid. id is not writable.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "firstName": { "$ref": "#/properties/firstName" },
+        "lastName": { "$ref": "#/properties/lastName" },
+        "email": { "$ref": "#/properties/email" },
+        "department": { "$ref": "#/properties/department" },
+        "title": { "$ref": "#/properties/title" },
+        "hireDate": { "$ref": "#/properties/hireDate" },
+        "status": { "$ref": "#/properties/status" }
+      }
+    }
+  }
+}

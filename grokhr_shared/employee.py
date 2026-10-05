@@ -29,7 +29,7 @@ class EmployeeBase(BaseModel):
     firstName: str = Field(min_length=1)
     lastName: str = Field(min_length=1)
     email: EmailStr
-    department: str = Field(min_length=1)
+    orgUnit: str = Field(min_length=1)
     title: str = Field(min_length=1)
     hireDate: date
     status: EmployeeStatus
@@ -51,7 +51,7 @@ class EmployeeUpdate(BaseModel):
     firstName: str | None = Field(default=None, min_length=1)
     lastName: str | None = Field(default=None, min_length=1)
     email: EmailStr | None = None
-    department: str | None = Field(default=None, min_length=1)
+    orgUnit: str | None = Field(default=None, min_length=1)
     title: str | None = Field(default=None, min_length=1)
     hireDate: date | None = None
     status: EmployeeStatus | None = None
@@ -60,7 +60,7 @@ class EmployeeUpdate(BaseModel):
         "firstName",
         "lastName",
         "email",
-        "department",
+        "orgUnit",
         "title",
         "hireDate",
         "status",

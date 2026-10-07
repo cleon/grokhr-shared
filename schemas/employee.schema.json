@@ -50,7 +50,8 @@
     },
     "status": {
       "type": "string",
-      "enum": ["active", "inactive"]
+      "description": "Employment state. on_leave covers extended leave (parental, medical, sabbatical) and is distinct from inactive.",
+      "enum": ["active", "inactive", "on_leave"]
     }
   },
   "examples": [
@@ -63,6 +64,16 @@
       "title": "HR Generalist",
       "hireDate": "2022-03-14",
       "status": "active"
+    },
+    {
+      "id": "emp_example_002",
+      "firstName": "Jordan",
+      "lastName": "Example",
+      "email": "jordan.example@example.com",
+      "department": "People Operations",
+      "title": "People Partner",
+      "hireDate": "2019-06-03",
+      "status": "on_leave"
     }
   ],
   "$defs": {

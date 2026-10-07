@@ -20,7 +20,7 @@ The canonical document is [`schemas/employee.schema.json`](schemas/employee.sche
 | `department` | string | Non-empty |
 | `title` | string | Non-empty |
 | `hireDate` | string (date) | ISO calendar date `YYYY-MM-DD` |
-| `status` | string | `active` or `inactive` |
+| `status` | string | `active`, `inactive`, or `on_leave` (extended leave: parental, medical, sabbatical) |
 
 Unknown fields are rejected. `POST` body is `EmployeeCreate` (Employee without `id`). `PATCH` body is `EmployeeUpdate` (any subset of the create fields). Omit a field to leave it unchanged. `null` is rejected.
 
@@ -59,13 +59,13 @@ Point the web app at a packed tarball or at this checkout.
 
 ```bash
 npm pack
-# writes grokhr-shared-0.1.0.tgz
+# writes grokhr-shared-0.2.0.tgz
 ```
 
 ```json
 {
   "dependencies": {
-    "@grokhr/shared": "file:../grokhr-shared/grokhr-shared-0.1.0.tgz"
+    "@grokhr/shared": "file:../grokhr-shared/grokhr-shared-0.2.0.tgz"
   }
 }
 ```

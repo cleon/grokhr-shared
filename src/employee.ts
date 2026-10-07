@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /** Wire values for Employee.status. Matches the JSON Schema enum. */
-export const EMPLOYEE_STATUSES = ["active", "inactive"] as const;
+export const EMPLOYEE_STATUSES = ["active", "inactive", "on_leave"] as const;
 
 export const employeeStatusSchema = z.enum(EMPLOYEE_STATUSES);
 

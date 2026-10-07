@@ -15,6 +15,9 @@ import {
 const example = JSON.parse(
   readFileSync(new URL("../fixtures/employee.example.json", import.meta.url), "utf8"),
 );
+const onLeave = JSON.parse(
+  readFileSync(new URL("../fixtures/employee.on_leave.json", import.meta.url), "utf8"),
+);
 const schema = JSON.parse(
   readFileSync(new URL("../schemas/employee.schema.json", import.meta.url), "utf8"),
 );
@@ -34,6 +37,19 @@ test("parses the shared example and helpers", () => {
 test("isActive is false for inactive employees", () => {
   const employee = employeeSchema.parse({ ...example, status: "inactive" });
   assert.equal(isActive(employee), false);
+});
+
+test("on_leave is a valid status and is not active", () => {
+  const employee = employeeSchema.parse(onLeave);
+  assert.equal(employee.status, "on_leave");
+  assert.equal(isActive(employee), false);
+  assert.deepEqual(employee, onLeave);
+
+  const create = withoutId(onLeave);
+  assert.deepEqual(employeeCreateSchema.parse(create), create);
+  assert.deepEqual(employeeUpdateSchema.parse({ status: "on_leave" }), {
+    status: "on_leave",
+  });
 });
 
 test("rejects invalid employee documents", () => {
@@ -61,7 +77,9 @@ test("create omits id and update is a partial", () => {
 test("zod object matches the canonical schema", () => {
   assert.deepEqual(Object.keys(employeeSchema.shape).sort(), [...schema.required].sort());
   assert.deepEqual([...EMPLOYEE_STATUSES], schema.properties.status.enum);
+  assert.ok(schema.properties.status.enum.includes("on_leave"));
   assert.deepEqual(schema.examples[0], example);
+  assert.deepEqual(schema.examples[1], onLeave);
   assert.deepEqual(
     schema.$defs.EmployeeCreate.required.sort(),
     schema.required.filter((field) => field !== "id").sort(),

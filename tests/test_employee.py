@@ -19,6 +19,7 @@ from grokhr_shared import (
 
 ROOT = Path(__file__).resolve().parents[1]
 EXAMPLE = json.loads((ROOT / "fixtures" / "employee.example.json").read_text(encoding="utf-8"))
+ON_LEAVE = json.loads((ROOT / "fixtures" / "employee.on_leave.json").read_text(encoding="utf-8"))
 
 
 def _without_id(employee: dict) -> dict:
@@ -47,6 +48,18 @@ def test_inactive_helper():
     employee = Employee.model_validate({**EXAMPLE, "status": "inactive"})
     assert employee.status is EmployeeStatus.inactive
     assert is_active(employee) is False
+
+
+def test_on_leave_status():
+    employee = Employee.model_validate(ON_LEAVE)
+    assert employee.model_dump(mode="json") == ON_LEAVE
+    assert employee.status is EmployeeStatus.on_leave
+    assert is_active(employee) is False
+
+    created = EmployeeCreate.model_validate(_without_id(ON_LEAVE))
+    assert created.status is EmployeeStatus.on_leave
+    patched = EmployeeUpdate.model_validate({"status": "on_leave"})
+    assert patched.model_dump(exclude_unset=True) == {"status": EmployeeStatus.on_leave}
 
 
 def test_rejects_invalid_employee_documents():
@@ -87,10 +100,13 @@ def test_model_matches_canonical_schema():
     assert set(Employee.model_fields) == set(schema["required"])
     assert set(EmployeeCreate.model_fields) == set(schema["required"]) - {"id"}
     assert list(EMPLOYEE_STATUSES) == schema["properties"]["status"]["enum"]
+    assert "on_leave" in schema["properties"]["status"]["enum"]
     assert schema["examples"][0] == EXAMPLE
+    assert schema["examples"][1] == ON_LEAVE
 
     validator = Draft202012Validator(schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
     validator.validate(EXAMPLE)
+    validator.validate(ON_LEAVE)
     with pytest.raises(SchemaValidationError):
         validator.validate({**EXAMPLE, "status": "terminated"})
     with pytest.raises(SchemaValidationError):

@@ -18,6 +18,7 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 class EmployeeStatus(str, Enum):
     active = "active"
     inactive = "inactive"
+    on_leave = "on_leave"
 
 
 EMPLOYEE_STATUSES = tuple(status.value for status in EmployeeStatus)

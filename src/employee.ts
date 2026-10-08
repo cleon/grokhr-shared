@@ -15,6 +15,7 @@ export const employeeSchema = z
     email: z.string().email(),
     department: z.string().min(1),
     title: z.string().min(1),
+    phone: z.string().min(1).optional(),
     hireDate: z.string().date(),
     status: employeeStatusSchema,
   })

@@ -19,6 +19,7 @@ The canonical document is [`schemas/employee.schema.json`](schemas/employee.sche
 | `email` | string (email) | Use an `@example.com` address |
 | `department` | string | Non-empty |
 | `title` | string | Non-empty |
+| `phone` | string | Optional. Fictional work phone |
 | `hireDate` | string (date) | ISO calendar date `YYYY-MM-DD` |
 | `status` | string | `active` or `inactive` |
 

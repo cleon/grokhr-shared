@@ -64,6 +64,29 @@ def test_rejects_invalid_employee_documents():
         Employee.model_validate({**EXAMPLE, "nickname": "Ace"})
 
 
+def test_phone_optional_omitted_when_absent():
+    with_phone = Employee.model_validate(EXAMPLE)
+    assert with_phone.phone == "+1-555-010-0142"
+
+    without = {key: value for key, value in EXAMPLE.items() if key != "phone"}
+    employee = Employee.model_validate(without)
+    assert employee.phone is None
+    assert employee.model_dump(mode="json") == without
+    assert "phone" not in employee.model_dump(mode="json")
+
+    created = EmployeeCreate.model_validate(_without_id(without))
+    assert created.model_dump(mode="json") == _without_id(without)
+
+    patch = EmployeeUpdate.model_validate({"phone": EXAMPLE["phone"]})
+    assert patch.model_dump(exclude_unset=True) == {"phone": EXAMPLE["phone"]}
+    with pytest.raises(ValidationError):
+        Employee.model_validate({**EXAMPLE, "phone": None})
+    with pytest.raises(ValidationError):
+        EmployeeCreate.model_validate({**_without_id(EXAMPLE), "phone": None})
+    with pytest.raises(ValidationError):
+        EmployeeUpdate.model_validate({"phone": None})
+
+
 def test_create_omits_id_and_update_is_partial():
     create_body = _without_id(EXAMPLE)
     created = EmployeeCreate.model_validate(create_body)
@@ -84,13 +107,24 @@ def test_model_matches_canonical_schema():
     schema = load_employee_schema()
     Draft202012Validator.check_schema(schema)
 
-    assert set(Employee.model_fields) == set(schema["required"])
-    assert set(EmployeeCreate.model_fields) == set(schema["required"]) - {"id"}
+    assert set(Employee.model_fields) == set(schema["properties"])
+    assert set(schema["required"]) == {
+        name for name, field in Employee.model_fields.items() if field.is_required()
+    }
+    assert set(EmployeeCreate.model_fields) == set(schema["properties"]) - {"id"}
+    assert set(schema["$defs"]["EmployeeCreate"]["required"]) == {
+        name for name, field in EmployeeCreate.model_fields.items() if field.is_required()
+    }
+    assert "phone" not in schema["required"]
     assert list(EMPLOYEE_STATUSES) == schema["properties"]["status"]["enum"]
     assert schema["examples"][0] == EXAMPLE
 
     validator = Draft202012Validator(schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
     validator.validate(EXAMPLE)
+    without_phone = {key: value for key, value in EXAMPLE.items() if key != "phone"}
+    validator.validate(without_phone)
+    with pytest.raises(SchemaValidationError):
+        validator.validate({**EXAMPLE, "phone": None})
     with pytest.raises(SchemaValidationError):
         validator.validate({**EXAMPLE, "status": "terminated"})
     with pytest.raises(SchemaValidationError):
@@ -102,6 +136,9 @@ def test_model_matches_canonical_schema():
         create_schema, format_checker=Draft202012Validator.FORMAT_CHECKER
     )
     create_validator.validate(_without_id(EXAMPLE))
+    create_validator.validate(_without_id(without_phone))
+    with pytest.raises(SchemaValidationError):
+        create_validator.validate({**_without_id(EXAMPLE), "phone": None})
     with pytest.raises(SchemaValidationError):
         create_validator.validate(EXAMPLE)
 
@@ -110,7 +147,10 @@ def test_model_matches_canonical_schema():
     update_validator = Draft202012Validator(update_schema)
     update_validator.validate({})
     update_validator.validate({"title": "HR Manager"})
+    update_validator.validate({"phone": EXAMPLE["phone"]})
     with pytest.raises(SchemaValidationError):
         update_validator.validate({"title": None})
+    with pytest.raises(SchemaValidationError):
+        update_validator.validate({"phone": None})
     with pytest.raises(SchemaValidationError):
         update_validator.validate({"id": EXAMPLE["id"]})

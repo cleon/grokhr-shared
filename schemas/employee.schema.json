@@ -51,6 +51,10 @@
     "status": {
       "type": "string",
       "enum": ["active", "inactive"]
+    },
+    "phone": {
+      "type": "string",
+      "description": "Optional work phone. Omit when absent."
     }
   },
   "examples": [
@@ -62,7 +66,8 @@
       "department": "People Operations",
       "title": "HR Generalist",
       "hireDate": "2022-03-14",
-      "status": "active"
+      "status": "active",
+      "phone": "+1-555-010-0142"
     }
   ],
   "$defs": {
@@ -87,7 +92,8 @@
         "department": { "$ref": "#/properties/department" },
         "title": { "$ref": "#/properties/title" },
         "hireDate": { "$ref": "#/properties/hireDate" },
-        "status": { "$ref": "#/properties/status" }
+        "status": { "$ref": "#/properties/status" },
+        "phone": { "$ref": "#/properties/phone" }
       }
     },
     "EmployeeUpdate": {
@@ -102,7 +108,8 @@
         "department": { "$ref": "#/properties/department" },
         "title": { "$ref": "#/properties/title" },
         "hireDate": { "$ref": "#/properties/hireDate" },
-        "status": { "$ref": "#/properties/status" }
+        "status": { "$ref": "#/properties/status" },
+        "phone": { "$ref": "#/properties/phone" }
       }
     }
   }

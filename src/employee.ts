@@ -17,6 +17,7 @@ export const employeeSchema = z
     title: z.string().min(1),
     hireDate: z.string().date(),
     status: employeeStatusSchema,
+    phone: z.string().optional(),
   })
   .strict();
 

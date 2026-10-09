@@ -2,6 +2,7 @@
 
 from grokhr_shared.employee import (
     EMPLOYEE_STATUSES,
+    Department,
     Employee,
     EmployeeCreate,
     EmployeeStatus,
@@ -14,6 +15,7 @@ from grokhr_shared.employee import (
 
 __all__ = [
     "EMPLOYEE_STATUSES",
+    "Department",
     "Employee",
     "EmployeeCreate",
     "EmployeeStatus",
@@ -24,4 +26,4 @@ __all__ = [
     "load_employee_schema",
 ]
 
-__version__ = "0.1.0"
+__version__ = "1.0.0"

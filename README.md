@@ -9,6 +9,46 @@ Both apps depend on this repo:
 
 The canonical document is [`schemas/employee.schema.json`](schemas/employee.schema.json). The TypeScript zod schemas and the Python Pydantic models mirror it.
 
+## Breaking changes
+
+### 1.0.0
+
+`department` (a free-text name) is removed from `Employee`, `EmployeeCreate`, and `EmployeeUpdate`. Those types now require `departmentId` (string).
+
+`Department` is `{ id: string, name: string }`. Keep `id` stable and change `name` when a department is renamed. Read the display name from `Department.name`.
+
+Migrate a consumer:
+
+1. Depend on `@grokhr/shared` / `grokhr_shared` `1.0.0`.
+2. Create a `Department` for each distinct department name you already store, and keep that `id`.
+3. Replace `department` with `departmentId` on employee responses, `POST` bodies, and `PATCH` bodies.
+4. Remove `department` from requests. Payloads that still include it fail validation.
+
+```ts
+// before
+employee.department; // "People Operations"
+
+// after
+employee.departmentId; // "dept_people_ops"
+department.name; // "People Operations"
+```
+
+## Department
+
+| Field | JSON type | Rules |
+| --- | --- | --- |
+| `id` | string | Stable, non-empty. Referenced by `Employee.departmentId`. |
+| `name` | string | Non-empty display name. |
+
+```json
+{
+  "id": "dept_people_ops",
+  "name": "People Operations"
+}
+```
+
+TypeScript exports `departmentSchema` and `Department`. Python exports `Department`.
+
 ## Employee
 
 | Field | JSON type | Rules |
@@ -17,7 +57,7 @@ The canonical document is [`schemas/employee.schema.json`](schemas/employee.sche
 | `firstName` | string | Non-empty |
 | `lastName` | string | Non-empty |
 | `email` | string (email) | Use an `@example.com` address |
-| `department` | string | Non-empty |
+| `departmentId` | string | Non-empty. `Department.id`. |
 | `title` | string | Non-empty |
 | `hireDate` | string (date) | ISO calendar date `YYYY-MM-DD` |
 | `status` | string | `active` or `inactive` |
@@ -30,7 +70,7 @@ Unknown fields are rejected. `POST` body is `EmployeeCreate` (Employee without `
   "firstName": "Avery",
   "lastName": "Example",
   "email": "avery.example@example.com",
-  "department": "People Operations",
+  "departmentId": "dept_people_ops",
   "title": "HR Generalist",
   "hireDate": "2022-03-14",
   "status": "active"
@@ -59,13 +99,13 @@ Point the web app at a packed tarball or at this checkout.
 
 ```bash
 npm pack
-# writes grokhr-shared-0.1.0.tgz
+# writes grokhr-shared-1.0.0.tgz
 ```
 
 ```json
 {
   "dependencies": {
-    "@grokhr/shared": "file:../grokhr-shared/grokhr-shared-0.1.0.tgz"
+    "@grokhr/shared": "file:../grokhr-shared/grokhr-shared-1.0.0.tgz"
   }
 }
 ```
@@ -82,13 +122,20 @@ A path dependency also works after `npm run build` here. npm packs `file:` depen
 
 ```ts
 import {
+  departmentSchema,
   employeeSchema,
   employeeCreateSchema,
   employeeUpdateSchema,
   displayName,
   isActive,
+  type Department,
   type Employee,
 } from "@grokhr/shared";
+
+const department: Department = departmentSchema.parse({
+  id: "dept_people_ops",
+  name: "People Operations",
+});
 
 const employee: Employee = employeeSchema.parse(payload);
 displayName(employee);
@@ -123,7 +170,7 @@ The distribution name is `grokhr_shared` (pip also accepts `grokhr-shared`). Imp
 
 ```python
 from fastapi import FastAPI
-from grokhr_shared import Employee, EmployeeCreate, display_name, is_active
+from grokhr_shared import Department, Employee, EmployeeCreate, display_name, is_active
 
 app = FastAPI()
 

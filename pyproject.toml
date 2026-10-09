@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "grokhr_shared"
-version = "0.1.0"
+version = "1.0.0"
 description = "Shared Employee contracts for the GrokHR demo."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -30,6 +30,7 @@ include = [
   "grokhr_shared",
   "schemas/employee.schema.json",
   "fixtures/employee.example.json",
+  "fixtures/department.example.json",
   "README.md",
   "pyproject.toml",
 ]

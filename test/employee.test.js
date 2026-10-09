@@ -58,13 +58,40 @@ test("create omits id and update is a partial", () => {
   assert.throws(() => employeeUpdateSchema.parse({ id: example.id }), ZodError);
 });
 
+test("phone is optional and omitted when absent", () => {
+  const employee = employeeSchema.parse(example);
+  assert.equal(employee.phone, "+1-555-010-0142");
+
+  const { phone: _phone, ...withoutPhone } = example;
+  const parsed = employeeSchema.parse(withoutPhone);
+  assert.deepEqual(parsed, withoutPhone);
+  assert.equal(Object.hasOwn(parsed, "phone"), false);
+
+  assert.deepEqual(employeeCreateSchema.parse(withoutId(withoutPhone)), withoutId(withoutPhone));
+  assert.deepEqual(employeeUpdateSchema.parse({ phone: example.phone }), { phone: example.phone });
+  assert.throws(() => employeeSchema.parse({ ...example, phone: null }), ZodError);
+  assert.throws(() => employeeCreateSchema.parse({ ...withoutId(example), phone: null }), ZodError);
+  assert.throws(() => employeeUpdateSchema.parse({ phone: null }), ZodError);
+});
+
 test("zod object matches the canonical schema", () => {
-  assert.deepEqual(Object.keys(employeeSchema.shape).sort(), [...schema.required].sort());
+  const shapeKeys = Object.keys(employeeSchema.shape);
+  const optionalKeys = shapeKeys.filter((key) => employeeSchema.shape[key].isOptional());
+  assert.deepEqual(optionalKeys, ["phone"]);
+  assert.deepEqual(
+    shapeKeys.filter((key) => !optionalKeys.includes(key)).sort(),
+    [...schema.required].sort(),
+  );
+  assert.deepEqual(shapeKeys.sort(), Object.keys(schema.properties).sort());
+  assert.equal(schema.required.includes("phone"), false);
   assert.deepEqual([...EMPLOYEE_STATUSES], schema.properties.status.enum);
   assert.deepEqual(schema.examples[0], example);
   assert.deepEqual(
     schema.$defs.EmployeeCreate.required.sort(),
     schema.required.filter((field) => field !== "id").sort(),
   );
+  assert.equal(schema.$defs.EmployeeCreate.required.includes("phone"), false);
+  assert.deepEqual(schema.$defs.EmployeeCreate.properties.phone, { $ref: "#/properties/phone" });
+  assert.deepEqual(schema.$defs.EmployeeUpdate.properties.phone, { $ref: "#/properties/phone" });
   assert.deepEqual(schema.$defs.EmployeeUpdate.required, undefined);
 });

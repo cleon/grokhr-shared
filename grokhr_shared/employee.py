@@ -12,7 +12,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_serializer
 
 
 class EmployeeStatus(str, Enum):
@@ -33,6 +33,23 @@ class EmployeeBase(BaseModel):
     title: str = Field(min_length=1)
     hireDate: date
     status: EmployeeStatus
+    phone: str | None = None
+
+    @field_validator("phone", mode="before")
+    @classmethod
+    def reject_null_phone(cls, value: object) -> object:
+        # Omitted phone uses the default. Explicit null is not a stored value.
+        if value is None:
+            raise ValueError("cannot be null")
+        return value
+
+    @model_serializer(mode="wrap")
+    def omit_absent_phone(self, handler, _info):
+        # Wire documents omit phone when it was not provided.
+        data = handler(self)
+        if isinstance(data, dict) and data.get("phone") is None:
+            return {key: item for key, item in data.items() if key != "phone"}
+        return data
 
 
 class EmployeeCreate(EmployeeBase):
@@ -55,6 +72,7 @@ class EmployeeUpdate(BaseModel):
     title: str | None = Field(default=None, min_length=1)
     hireDate: date | None = None
     status: EmployeeStatus | None = None
+    phone: str | None = None
 
     @field_validator(
         "firstName",
@@ -64,6 +82,7 @@ class EmployeeUpdate(BaseModel):
         "title",
         "hireDate",
         "status",
+        "phone",
         mode="before",
     )
     @classmethod

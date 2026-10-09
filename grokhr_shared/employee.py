@@ -23,13 +23,22 @@ class EmployeeStatus(str, Enum):
 EMPLOYEE_STATUSES = tuple(status.value for status in EmployeeStatus)
 
 
+class Department(BaseModel):
+    """Department record. Employees store departmentId so a rename does not rewrite every employee."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str = Field(min_length=1)
+    name: str = Field(min_length=1)
+
+
 class EmployeeBase(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     firstName: str = Field(min_length=1)
     lastName: str = Field(min_length=1)
     email: EmailStr
-    department: str = Field(min_length=1)
+    departmentId: str = Field(min_length=1)
     title: str = Field(min_length=1)
     hireDate: date
     status: EmployeeStatus
@@ -51,7 +60,7 @@ class EmployeeUpdate(BaseModel):
     firstName: str | None = Field(default=None, min_length=1)
     lastName: str | None = Field(default=None, min_length=1)
     email: EmailStr | None = None
-    department: str | None = Field(default=None, min_length=1)
+    departmentId: str | None = Field(default=None, min_length=1)
     title: str | None = Field(default=None, min_length=1)
     hireDate: date | None = None
     status: EmployeeStatus | None = None
@@ -60,7 +69,7 @@ class EmployeeUpdate(BaseModel):
         "firstName",
         "lastName",
         "email",
-        "department",
+        "departmentId",
         "title",
         "hireDate",
         "status",

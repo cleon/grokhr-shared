@@ -1,5 +1,6 @@
 export {
   EMPLOYEE_STATUSES,
+  departmentSchema,
   displayName,
   employeeCreateSchema,
   employeeSchema,
@@ -9,6 +10,7 @@ export {
 } from "./employee.js";
 
 export type {
+  Department,
   Employee,
   EmployeeCreate,
   EmployeeStatus,

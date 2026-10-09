@@ -7,13 +7,22 @@ export const employeeStatusSchema = z.enum(EMPLOYEE_STATUSES);
 
 export type EmployeeStatus = z.infer<typeof employeeStatusSchema>;
 
+export const departmentSchema = z
+  .object({
+    id: z.string().min(1),
+    name: z.string().min(1),
+  })
+  .strict();
+
+export type Department = z.infer<typeof departmentSchema>;
+
 export const employeeSchema = z
   .object({
     id: z.string().min(1),
     firstName: z.string().min(1),
     lastName: z.string().min(1),
     email: z.string().email(),
-    department: z.string().min(1),
+    departmentId: z.string().min(1),
     title: z.string().min(1),
     hireDate: z.string().date(),
     status: employeeStatusSchema,

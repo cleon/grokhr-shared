@@ -3,7 +3,7 @@
   "firstName": "Avery",
   "lastName": "Example",
   "email": "avery.example@example.com",
-  "department": "People Operations",
+  "departmentId": "dept_people_ops",
   "title": "HR Generalist",
   "hireDate": "2022-03-14",
   "status": "active"

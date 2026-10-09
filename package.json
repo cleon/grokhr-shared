@@ -1,6 +1,6 @@
 {
   "name": "@grokhr/shared",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Shared Employee contracts for the GrokHR demo (JSON Schema, TypeScript, Python).",
   "type": "module",
   "main": "./dist/index.js",
